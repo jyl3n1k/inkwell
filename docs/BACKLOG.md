@@ -16,5 +16,5 @@ Definition of Done: see [README.md](../README.md).
 
 ## Story-Point Justifications
 
-- **US-08 — 5 points:** Password reset requires secure, expiring reset tokens, identity verification, and email delivery across multiple parts of the system.
-- **US-09 — 3 points:** Post editing builds on the existing post workflow but requires authorization checks, an editing interface, and an API update operation.
+- **US-08 - 5 points:** This may take more work because it needs password reset links, email, and security checks.
+- **US-09 - 3 points:** This should take less work because it builds on the existing system for creating posts.
