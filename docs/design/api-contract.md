@@ -59,3 +59,26 @@ Success:
 
 - Status: 200 OK
 - Body: `{ posts: PostPublic[], page: number, hasMore: boolean }`
+
+## POST /api/posts/:id/comments
+
+Creates a comment on the post identified by `:id`. The authenticated user becomes the comment's author.
+
+Request:
+
+```json
+{
+  "body": "This is a comment."
+}
+```
+
+Success:
+
+- Status: 201 Created
+- Body: `{ comment: CommentPublic }`
+
+Errors:
+
+- 400 `EMPTY_COMMENT` — "Comment body cannot be empty."
+- 401 `AUTHENTICATION_REQUIRED` — "You must be logged in to comment."
+- 404 `POST_NOT_FOUND` — "The requested post was not found."
