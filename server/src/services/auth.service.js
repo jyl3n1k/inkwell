@@ -49,7 +49,11 @@ export const AuthService = {
     const tokens = TokenService.issueTokens(user);
 
     return {
-      user,
+      user: {
+        id: user.id,
+        email: user.email,
+        displayName: user.displayName
+      },
       ...tokens
     };
   },
@@ -73,7 +77,11 @@ export const AuthService = {
     const tokens = TokenService.issueTokens(user);
 
     return {
-      user,
+      user: {
+        id: user.id,
+        email: user.email,
+        displayName: user.displayName
+      },
       ...tokens
     };
   }
