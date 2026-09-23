@@ -70,7 +70,7 @@ export function PostEditor() {
       <button
         type="submit"
         disabled={status === "publishing"}
-        className="rounded bg-indigo-600 px-4 py-2 text-white disabled:opacity-50"
+        className="w-full md:w-auto min-h-[44px] rounded bg-indigo-600 px-4 py-2 text-white disabled:opacity-50"
       >
         {status === "publishing" ? "Publishing..." : "Publish"}
       </button>

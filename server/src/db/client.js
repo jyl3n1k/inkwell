@@ -1,32 +1,14 @@
-// Workshop placeholder: data resets whenever the server restarts.
-const users = [];
-const posts = [];
-let nextUserId = 1;
-let nextPostId = 1;
+import pkg from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-export const prisma = {
-  user: {
-    async findUnique({ where: { email } }) {
-      return users.find((user) => user.email === email) ?? null;
-    },
-    async create({ data }) {
-      const user = { id: String(nextUserId++), ...data };
-      users.push(user);
-      return user;
-    },
-  },
-  post: {
-    async create({ data }) {
-      const post = { id: String(nextPostId++), ...data };
-      posts.push(post);
-      return post;
-    },
-    async findMany({ where, orderBy, skip = 0, take }) {
-      const field = Object.keys(orderBy)[0];
-      return posts
-        .filter((post) => !where?.status || post.status === where.status)
-        .sort((a, b) => new Date(b[field]) - new Date(a[field]))
-        .slice(skip, take === undefined ? undefined : skip + take);
-    },
-  },
-};
+const { PrismaClient } = pkg;
+
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL is not set");
+}
+
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL,
+});
+
+export const prisma = new PrismaClient({ adapter });
