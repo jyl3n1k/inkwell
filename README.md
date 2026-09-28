@@ -16,3 +16,24 @@ A backlog item is Done when:
 Inkwell follows an incremental development process: one lecture, one increment.
 
 See [docs/BACKLOG.md](docs/BACKLOG.md) for the current product backlog.
+
+## Workshop 9
+
+With PostgreSQL running and `server/.env` configured, run from `server`:
+
+```bash
+npm install
+npx prisma migrate dev
+npx prisma generate
+npm run dev
+```
+
+Publishing accepts an optional `tagNames` array. Tags are trimmed, lowercased,
+and deduplicated. `GET /api/posts?search=design&page=1` searches published
+posts by title, body, or tag through the substring search strategy.
+
+Two listeners handle `post.published`: one logs the event and one increments
+the counter returned by `GET /api/stats` as `{ "totalPostsPublished": 0 }`.
+This counter starts at zero on each server start; it is not a database total.
+Verify it increases once per successful publish and does not increase when
+publishing fails validation.

@@ -18,3 +18,13 @@ Definition of Done: see [README.md](../README.md).
 
 - **US-08 - 5 points:** This may take more work because it needs password reset links, email, and security checks.
 - **US-09 - 3 points:** This should take less work because it builds on the existing system for creating posts.
+
+## Workshop 9 additions
+
+The handout calls these US-08 and US-09. Those IDs are already used above,
+so this repository assigns US-10 and US-11.
+
+- **US-10:** As an author, I want to tag my post with one or more topics,
+  so that readers can discover it by subject.
+- **US-11:** As a reader, I want to search posts by keyword or tag,
+  so that I can find content relevant to me.
