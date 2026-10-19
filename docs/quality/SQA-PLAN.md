@@ -15,8 +15,8 @@
 
 ## Testing
 
-- Current verification is primarily manual.
-- Unit tests for Services and Repositories are planned for Lecture 12.
+- Verification includes automated service unit tests and manual checks.
+- Unit tests: Services and Repositories (Jest) — ACTIVE as of Lecture 12. Current suites cover AuthService and PostService with mocked repositories.
 - Route integration tests are planned for Lecture 13.
 - End-to-end tests for critical flows are planned for Lecture 14.
 - Passing the checks currently available does not establish reliability under all inputs or operating conditions.
