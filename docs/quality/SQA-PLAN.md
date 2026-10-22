@@ -15,11 +15,14 @@
 
 ## Testing
 
-- Verification includes automated service unit tests and manual checks.
-- Unit tests: Services and Repositories (Jest) — ACTIVE as of Lecture 12. Current suites cover AuthService and PostService with mocked repositories.
-- Route integration tests are planned for Lecture 13.
-- End-to-end tests for critical flows are planned for Lecture 14.
-- Passing the checks currently available does not establish reliability under all inputs or operating conditions.
+- Unit tests: AuthService and PostService with mocked repositories (Jest) - ACTIVE (Lecture 12).
+- Integration tests: Routes -> Services -> Repositories with an isolated real test database (Supertest) - ACTIVE (Lecture 13).
+- Integration coverage: registration -> publishing -> browsing, duplicate registration, and registration -> login.
+- Component tests: PostEditor user interaction and API error feedback (React Testing Library and Vitest) - ACTIVE (Lecture 13).
+- End-to-end tests: critical user flows (Playwright) - starting Lecture 14.
+- Server verification: run npm test in server.
+- Client verification: run npx vitest run in client.
+- Test database: inkwell_test. server/.env.test is excluded from Git.
 
 ## Defect Tracking
 
