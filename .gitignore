@@ -4,3 +4,6 @@ dist/
 .log
 
 .env.test
+.env.e2e
+playwright-report/
+test-results/

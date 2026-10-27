@@ -24,28 +24,26 @@ export function Feed() {
     return () => { active = false; };
   }, []);
 
-  if (errorMessage) {
-    return <p role="alert" className="text-red-600">{errorMessage}</p>;
-  }
-
-  if (posts === null) {
-    return <p role="status" className="text-gray-500">Loading posts...</p>;
-  }
-
-  if (posts.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-gray-500">No posts yet.</p>
-        <Link to="/write" className="text-indigo-600 underline">
-          Write the first one
-        </Link>
-      </div>
-    );
-  }
-
   return (
-    <ul className="space-y-6">
-      {posts.map((post) => <PostCard key={post.id} post={post} />)}
-    </ul>
+    <section aria-labelledby="feed-heading">
+      <h1 id="feed-heading" className="mb-6 text-2xl font-bold">Feed</h1>
+      {errorMessage && <p role="alert" className="text-red-600">{errorMessage}</p>}
+      {!errorMessage && posts === null && (
+        <p role="status" className="text-gray-600">Loading posts...</p>
+      )}
+      {!errorMessage && posts?.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-gray-600">No posts yet.</p>
+          <Link to="/write" className="text-indigo-600 underline">
+            Write the first one
+          </Link>
+        </div>
+      )}
+      {!errorMessage && posts !== null && posts.length > 0 && (
+        <ul className="space-y-6">
+          {posts.map((post) => <PostCard key={post.id} post={post} />)}
+        </ul>
+      )}
+    </section>
   );
 }

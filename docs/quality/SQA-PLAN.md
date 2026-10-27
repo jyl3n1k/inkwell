@@ -19,7 +19,12 @@
 - Integration tests: Routes -> Services -> Repositories with an isolated real test database (Supertest) - ACTIVE (Lecture 13).
 - Integration coverage: registration -> publishing -> browsing, duplicate registration, and registration -> login.
 - Component tests: PostEditor user interaction and API error feedback (React Testing Library and Vitest) - ACTIVE (Lecture 13).
-- End-to-end tests: critical user flows (Playwright) - starting Lecture 14.
+- End-to-end tests: login, publish, and browse on mobile, tablet, and desktop (Playwright; Chromium, Firefox, WebKit) - ACTIVE (Lecture 14).
+- Automated accessibility checks: feed page (axe-core) - ACTIVE (Lecture 14). These complement manual accessibility reviews.
+- Documentation verification: fresh-checkout README setup - ACTIVE (Lecture 14); see README-VERIFICATION.md.
+- Security testing - starting Lecture 15.
+- Performance/load testing - deferred; revisit at Lectures 19-20.
+- E2E verification: run npm run test:e2e at the root. Uses a separate inkwell_e2e database and ports 4001/5174.
 - Server verification: run npm test in server.
 - Client verification: run npx vitest run in client.
 - Test database: inkwell_test. server/.env.test is excluded from Git.
