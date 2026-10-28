@@ -8,7 +8,7 @@ export function requireAuth(req, res, next) {
     if (typeof claims.sub !== "string" || !claims.sub) {
       throw new Error("Missing identity");
     }
-    req.authorId = claims.sub;
+    req.user = { id: claims.sub, email: claims.email };
   } catch {
     return res.status(401).json({
       error: {

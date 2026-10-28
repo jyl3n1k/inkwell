@@ -1,3 +1,4 @@
+import { toPublicUser } from "../dto/user.dto.js";
 import { prisma } from "../db/client.js";
 
 const include = {
@@ -13,7 +14,13 @@ async function list(where, page, pageSize) {
     skip: (page - 1) * pageSize,
     take: pageSize + 1,
   });
-  return { posts: rows.slice(0, pageSize), hasMore: rows.length > pageSize };
+  return {
+    posts: rows.slice(0, pageSize).map((post) => ({
+      ...post,
+      author: toPublicUser(post.author),
+    })),
+    hasMore: rows.length > pageSize,
+  };
 }
 
 export const PostRepository = {

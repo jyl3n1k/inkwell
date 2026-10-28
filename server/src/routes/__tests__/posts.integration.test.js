@@ -1,7 +1,11 @@
 import request from "supertest";
+import { ipKeyGenerator } from "express-rate-limit";
 import { app } from "../../app.js";
 import { prisma } from "../../db/client.js";
-import { resetDatabase } from "../../test-utils/fixtures.js";
+import { TokenService } from "../../services/token.service.js";
+import { createTestUser, resetDatabase } from "../../test-utils/fixtures.js";
+
+import { authRateLimiter } from "../../middleware/rate-limit.middleware.js";
 
 const registration = {
   email: "alice@example.com",
@@ -10,6 +14,8 @@ const registration = {
 };
 
 beforeEach(async () => {
+  await authRateLimiter.resetKey(ipKeyGenerator("::ffff:127.0.0.1"));
+  await authRateLimiter.resetKey(ipKeyGenerator("127.0.0.1"));
   await resetDatabase();
 });
 
@@ -103,4 +109,84 @@ test("exercise: registration and login work together", async () => {
 
   expect(published.status).toBe(201);
   expect(published.body.authorId).toBe(registered.body.user.id);
+});
+
+
+test("publishing ignores a forged authorId and uses the verified token identity", async () => {
+  const alice = await createTestUser();
+  const bob = await createTestUser();
+  const { accessToken } = TokenService.issueTokens(alice);
+  const response = await request(app).post("/api/posts")
+    .set("Authorization", `Bearer ${accessToken}`)
+    .send({ title: "Spoof attempt", body: "Content", authorId: bob.id });
+  expect(response.status).toBe(201);
+  expect(response.body.authorId).toBe(alice.id);
+  const saved = await prisma.post.findUnique({ where: { id: response.body.id } });
+  expect(saved.authorId).toBe(alice.id);
+});
+
+test.each([undefined, "Basic fake", "Bearer invalid"])(
+  "publishing rejects missing or invalid credentials: %s", async (authorization) => {
+    const pending = request(app).post("/api/posts");
+    if (authorization) pending.set("Authorization", authorization);
+    const response = await pending.send({ title: "No access", body: "Content" });
+    expect(response.status).toBe(401);
+    expect(await prisma.post.count()).toBe(0);
+  },
+);
+
+test("publishing rejects an expired token", async () => {
+  const { default: jwt } = await import("jsonwebtoken");
+  const token = jwt.sign({ sub: "expired-user" },
+    process.env.ACCESS_TOKEN_SECRET || "dev-access-secret", { expiresIn: -1 });
+  const response = await request(app).post("/api/posts")
+    .set("Authorization", `Bearer ${token}`)
+    .send({ title: "No access", body: "Content" });
+  expect(response.status).toBe(401);
+  expect(await prisma.post.count()).toBe(0);
+});
+
+test("feed and search expose only public author fields and honor pageSize", async () => {
+  const author = await createTestUser();
+  await prisma.post.createMany({ data: [1, 2].map((n) => ({
+    authorId: author.id, title: `Security ${n}`, body: "Content",
+    status: "PUBLISHED", publishedAt: new Date(),
+  })) });
+  for (const search of ["", "&search=Security"]) {
+    const response = await request(app).get(`/api/posts?pageSize=1${search}`);
+    expect(response.status).toBe(200);
+    expect(response.body.posts).toHaveLength(1);
+    expect(response.body.hasMore).toBe(true);
+    expect(response.body.posts[0].author).toEqual({ id: author.id, displayName: author.displayName });
+  }
+});
+
+test.each(["101", "1000000000", "0", "-1", "1.5", "NaN", "Infinity", "", "1&pageSize=2"])(
+  "feed and search reject invalid pageSize: %s", async (pageSize) => {
+    for (const search of ["", "&search=Security"]) {
+      const response = await request(app).get(`/api/posts?pageSize=${pageSize}${search}`);
+      expect(response.status).toBe(400);
+      expect(response.body.error.code).toBe("INVALID_PAGE_SIZE");
+    }
+  },
+);
+
+test("feed accepts the maximum pageSize", async () => {
+  const response = await request(app).get("/api/posts?pageSize=100");
+  expect(response.status).toBe(200);
+});
+
+test("login and registration share a five-request rate limit", async () => {
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const response = await request(app).post("/api/auth/login")
+      .send({ email: "missing@example.com", password: "wrongpassword" });
+    expect(response.status).toBe(401);
+  }
+  for (const endpoint of ["login", "register"]) {
+    const blocked = await request(app).post(`/api/auth/${endpoint}`).send(registration);
+    expect(blocked.status).toBe(429);
+    expect(blocked.body.error.code).toBe("TOO_MANY_ATTEMPTS");
+    expect(blocked.headers["retry-after"]).toBeDefined();
+  }
+  expect(await prisma.user.count()).toBe(0);
 });
