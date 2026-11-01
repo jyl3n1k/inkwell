@@ -6,6 +6,14 @@ import { EventBus } from "../events/event-bus.js";
 const searchStrategy = SubstringSearchStrategy;
 
 export const PostService = {
+  getById(id) {
+    return PostRepository.findById(id);
+  },
+
+  delete(id) {
+    return PostRepository.deleteById(id);
+  },
+
   async publish({ authorId, title, body, tagNames = [] }) {
     assertNonEmpty(title, "title", "MISSING_TITLE");
     assertNonEmpty(body, "body", "MISSING_BODY");

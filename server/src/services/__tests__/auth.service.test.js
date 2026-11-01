@@ -22,6 +22,7 @@ const {
   EmailAlreadyRegisteredError,
   WeakPasswordError,
   ValidationError,
+  InvalidCredentialsError,
 } = await import("../auth.service.js");
 
 const validInput = {
@@ -90,5 +91,25 @@ describe("AuthService.register", () => {
     await expect(AuthService.register(validInput))
       .rejects.toBeInstanceOf(EmailAlreadyRegisteredError);
     expect(mockTokenService.issueTokens).not.toHaveBeenCalled();
+  });
+});
+
+describe("AuthService.login security logging", () => {
+  test.each([false, true])("logs failed login when user exists: %s", async (exists) => {
+    const { logger } = await import("../../lib/logger.js");
+    const bcrypt = (await import("bcrypt")).default;
+    const user = exists ? { id: "u1", passwordHash: await bcrypt.hash("correcthorse", 4) } : null;
+    mockUserRepository.findByEmail.mockResolvedValue(user);
+    const log = jest.spyOn(logger, "warn").mockImplementation(() => {});
+    try {
+      await expect(AuthService.login({ email: validInput.email, password: "wrongpassword" }))
+        .rejects.toBeInstanceOf(InvalidCredentialsError);
+      expect(log).toHaveBeenCalledWith(
+        { event: "auth.login.failed", email: validInput.email }, "Failed login attempt",
+      );
+      expect(mockTokenService.issueTokens).not.toHaveBeenCalled();
+    } finally {
+      log.mockRestore();
+    }
   });
 });

@@ -1,3 +1,4 @@
+import { errorHandler } from "./middleware/error-handler.js";
 import express from "express";
 import healthRoutes from "./routes/health.routes.js";
 import versionRoutes from "./routes/version.routes.js";
@@ -16,12 +17,4 @@ app.use("/api", authRoutes);
 app.use("/api", postRoutes);
 app.use("/api", statsRoutes);
 
-app.use((err, _req, res, _next) => {
-  console.error(err);
-  res.status(err.status || 500).json({
-    error: {
-      code: err.code || "INTERNAL_ERROR",
-      message: err.message,
-    },
-  });
-});
+app.use(errorHandler);

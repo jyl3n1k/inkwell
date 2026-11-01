@@ -1,3 +1,4 @@
+import { logger } from "../lib/logger.js";
 import bcrypt from "bcrypt";
 import { UserRepository } from "../repositories/user.repository.js";
 import {
@@ -62,16 +63,8 @@ export const AuthService = {
   async login({ email, password }) {
     const user = await UserRepository.findByEmail(email);
 
-    if (!user) {
-      throw new InvalidCredentialsError();
-    }
-
-    const matches = await bcrypt.compare(
-      password,
-      user.passwordHash
-    );
-
-    if (!matches) {
+    if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
+      logger.warn({ event: "auth.login.failed", email }, "Failed login attempt");
       throw new InvalidCredentialsError();
     }
 

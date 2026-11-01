@@ -1,10 +1,14 @@
 import jwt from "jsonwebtoken";
 
-const ACCESS_TOKEN_SECRET =
-  process.env.ACCESS_TOKEN_SECRET || "dev-access-secret";
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
-const REFRESH_TOKEN_SECRET =
-  process.env.REFRESH_TOKEN_SECRET || "dev-refresh-secret";
+if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET ||
+    Buffer.byteLength(ACCESS_TOKEN_SECRET) < 32 ||
+    Buffer.byteLength(REFRESH_TOKEN_SECRET) < 32 ||
+    ACCESS_TOKEN_SECRET === REFRESH_TOKEN_SECRET) {
+  throw new Error("Set distinct ACCESS_TOKEN_SECRET and REFRESH_TOKEN_SECRET values of at least 32 bytes.");
+}
 
 const ACCESS_TOKEN_TTL = "15m";
 const REFRESH_TOKEN_TTL = "7d";

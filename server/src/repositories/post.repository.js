@@ -24,6 +24,14 @@ async function list(where, page, pageSize) {
 }
 
 export const PostRepository = {
+  findById(id) {
+    return prisma.post.findUnique({ where: { id } });
+  },
+
+  deleteById(id) {
+    return prisma.post.delete({ where: { id } });
+  },
+
   create({ authorId, title, body, status, publishedAt }) {
     return prisma.post.create({
       data: { authorId, title, body, status, publishedAt },
