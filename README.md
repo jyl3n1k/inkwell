@@ -182,6 +182,11 @@ Inkwell follows an incremental development process: one lecture, one increment.
 
 See [docs/BACKLOG.md](docs/BACKLOG.md) for the current product backlog.
 
+See the [SCM policy](docs/process/SCM-POLICY.md) for branching, commits, reviews,
+and release baselines. Use the [change request template](.github/CHANGE_REQUEST_TEMPLATE.md)
+for changes to released software. Release changes are recorded in the
+[changelog](CHANGELOG.md).
+
 ## Workshop 9
 
 With PostgreSQL running and `server/.env` configured, run from `server`:
