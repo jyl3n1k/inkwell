@@ -4,6 +4,34 @@ Inkwell is a Medium-like blog publishing platform developed incrementally throug
 
 ## Getting Started
 
+### Run the API and database with Docker (Workshop 18)
+
+With Docker Desktop running in Linux container mode, create a root `.env`
+containing `ACCESS_TOKEN_SECRET` and `REFRESH_TOKEN_SECRET` (see `.env.example`).
+Use independent random secrets, for example `openssl rand -hex 32` for each value.
+Keep `.env` private; Git ignores it. Preserve any existing values in that file.
+
+```bash
+docker compose up --build -d
+docker compose logs -f server
+```
+
+The server applies committed migrations before starting on http://localhost:3000.
+PostgreSQL is available to host tools on port 5433. Once startup completes:
+
+```bash
+curl --fail http://localhost:3000/api/health
+curl --fail-with-body http://localhost:3000/api/auth/register \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"docker-test@example.com","displayName":"Docker Test","password":"correcthorse"}'
+docker compose down
+```
+
+Expect the health response `{"status":"ok","service":"inkwell-api"}` and HTTP
+201 from registration. Use a fresh email when repeating registration. `down`
+preserves the database volume for the next startup. The Compose setup runs the
+API and database; use the development instructions below to run the client.
+
 Commands below use Git Bash on Windows, or a Bash shell on macOS/Linux.
 
 ### Prerequisites and checkout
