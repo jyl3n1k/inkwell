@@ -32,6 +32,12 @@ Expect the health response `{"status":"ok","service":"inkwell-api"}` and HTTP
 preserves the database volume for the next startup. The Compose setup runs the
 API and database; use the development instructions below to run the client.
 
+If HTTPS inspection causes a certificate error during the build, export your
+trusted root certificate as PEM outside the repository and build with
+`docker build --secret id=ca_cert,src=/path/to/trusted-root.pem -t inkwell-server ./server`.
+Then run `docker compose up -d --no-build`. The optional build secret is mounted
+only during dependency installation and Prisma generation.
+
 Commands below use Git Bash on Windows, or a Bash shell on macOS/Linux.
 
 ### Prerequisites and checkout

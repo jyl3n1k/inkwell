@@ -4,11 +4,16 @@ ENV NODE_ENV=production
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci --omit=dev
+# Optional trust bundle for hosts with HTTPS inspection; never stored in the image.
+RUN --mount=type=secret,id=ca_cert \
+    if [ -f /run/secrets/ca_cert ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/ca_cert; fi; \
+    npm ci --omit=dev
 
 COPY prisma.config.ts ./
 COPY prisma ./prisma
-RUN DATABASE_URL="postgresql://build:build@localhost:5432/build" npx --no-install prisma generate
+RUN --mount=type=secret,id=ca_cert \
+    if [ -f /run/secrets/ca_cert ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/ca_cert; fi; \
+    DATABASE_URL="postgresql://build:build@localhost:5432/build" npx --no-install prisma generate
 
 COPY src ./src
 COPY docker-entrypoint.sh ./
